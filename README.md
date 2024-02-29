@@ -1,14 +1,15 @@
 # MuesliSwap Market Making Bot
 
-Framework for the Muesliswap market making bot.  
-Stay tuned for our upcoming integration with MuesliSwap.
+Repository for the MuesliSwap market making bot framework.
+ 
+To use the framework for trading and liquidity provision on MuesliSwap, stay tuned for our upcoming integration with the MuesliSwap DEX.
 
 ## Project Documentation
 
 Below is a documentation of the files and directories in the project:
 
 - `keys/`: Will be created by ```gen_wallet.py```. Contains addreses, skeys and vkeys for transactions.
-- `logs/`: Log files for the bot's operations and events.
+- `logs/`: Log files for the bot's operations and events, will be created by the logger.
 - `strategies/`: Strategy configuration files in YAML format.
   - `standard_market_making_mainnet.yaml`: Configuration for standard market making on the mainnet.
   - `standard_market_making_preprod.yaml`: Configuration for standard market making on the preprod testnet.
