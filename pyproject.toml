@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "MuesliSwap Market Maker"
+version = "0.1.0"
+description = "Market Making Bot to provide liquidity on MuesliSwap"
+authors = ["MuesliSwapTeam <contact@muesliswap.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+blockfrost-python = ">=0.5.2"
+pycardano = ">=0.7.2"
+numpy = ">= 1.26.0"
+pyyaml = "^6.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
