@@ -1,13 +1,10 @@
-from pycardano import (
-    PaymentVerificationKey,
-    PaymentSigningKey,
-    Address,
-)
+from pycardano import PaymentVerificationKey, PaymentSigningKey, Address, StakeKeyPair
 
-from config import (
+from configs.config import (
     KEYS_DIR,
     NETWORK,
 )
+
 
 def create_signing_key(name: str):
     """
@@ -16,6 +13,10 @@ def create_signing_key(name: str):
     KEYS_DIR.mkdir(exist_ok=True)
     skey_path = KEYS_DIR.joinpath(f"{name}.skey")
     vkey_path = KEYS_DIR.joinpath(f"{name}.vkey")
+
+    staking_skey = KEYS_DIR.joinpath(f"{name}.staking.skey")
+    staking_vkey = KEYS_DIR.joinpath(f"{name}.staking.vkey")
+
     addr_path = KEYS_DIR.joinpath(f"{name}.addr")
 
     if skey_path.exists():
@@ -31,7 +32,20 @@ def create_signing_key(name: str):
     verification_key = PaymentVerificationKey.from_signing_key(signing_key)
     verification_key.save(str(vkey_path))
 
-    address = Address(payment_part=verification_key.hash(), network=NETWORK)
+    staking_key = StakeKeyPair.generate()
+
+    staking_singing_key = staking_key.signing_key
+    staking_singing_key.save(str(staking_skey))
+
+    staking_verification_key = staking_key.verification_key
+    staking_verification_key.save(str(staking_vkey))
+
+    address = Address(
+        payment_part=verification_key.hash(),
+        staking_part=staking_verification_key.hash(),
+        network=NETWORK,
+    )
+
     with open(addr_path, mode="w") as f:
         f.write(str(address))
 

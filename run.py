@@ -1,6 +1,6 @@
-from muesli_bot import MuesliMarketMaker
-from logger import get_logger
-from utils import load_strategy_config, check_wallets
+from bot.muesli_bot import MuesliMarketMaker
+from bot.utils.logger import get_logger
+from bot.utils.utils import load_strategy_config, check_wallets, create_local_orders_dir
 
 logger = get_logger(__name__)
 
@@ -12,12 +12,16 @@ def main():
         if strategy_config is None:
             logger.error("Failed to load strategy configuration.")
             return
+        
+        # Check existing wallets for the selected tokens
+        check_wallets(strategy_config['tokens'])
+
+        # Init local orders tracking
+        create_local_orders_dir()
+                 
         # Initialize the bot with the loaded strategy
         bot = MuesliMarketMaker(strategy_config)
 
-        # Check existing wallets for the selected tokens
-        check_wallets(bot.tokens)
-        
         # Start main loop
         bot.run_main_loop()
         

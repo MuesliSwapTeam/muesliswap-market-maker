@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
 blockfrost-python = ">=0.5.2"
-pycardano = ">=0.7.2"
+pycardano = "0.10.0"
 numpy = ">= 1.26.0"
 pyyaml = "^6.0.1"
 

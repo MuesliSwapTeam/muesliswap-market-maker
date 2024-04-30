@@ -1,5 +1,5 @@
 import yaml
-from typing import Tuple, Dict, List
+from typing import Tuple, Dict 
 
 from pycardano import (
     PaymentVerificationKey,
@@ -7,20 +7,25 @@ from pycardano import (
     Address,
 )
 
-from config import (
+from configs.config import (
     KEYS_DIR,
     NETWORK,
     STRATEGY_FILE,
-    KEY_PREFIX
+    KEY_PREFIX,
+    ORDER_TRACKING_DIR,
+    CONTEXT,
 )
 
-from gen_wallet import create_signing_key
+from bot.utils.gen_wallet import create_signing_key
 
-from logger import get_logger
+from bot.utils.logger import get_logger, log_exception
 
 logger = get_logger(__name__)
 
-def get_signing_info(name: str) -> Tuple[PaymentVerificationKey, PaymentSigningKey, Address]:
+
+def get_signing_info(
+    name: str,
+) -> Tuple[PaymentVerificationKey, PaymentSigningKey, Address]:
     """
     Extract the signing info from the key files.
     """
@@ -43,11 +48,13 @@ def get_address(name: str, token_name: str) -> Address:
     Get the wallet address for the token.
     """
     try:
-        with open(KEYS_DIR.joinpath(f"{name}.addr"), 'r') as f:
+        with open(KEYS_DIR.joinpath(f"{name}.addr"), "r") as f:
             address = Address.from_primitive(f.read().strip())
         return address
     except FileNotFoundError:
-        logger.error(f"Address file not found for {token_name}. You need to create a wallet first.")
+        logger.error(
+            f"Address file not found for {token_name}. You need to create a wallet first."
+        )
         raise
     except Exception as e:
         logger.exception(f"Error reading address for {token_name}: {e}")
@@ -59,7 +66,7 @@ def load_strategy_config() -> Dict:
     Load the strategy configuration from the YAML file.
     """
     try:
-        with open(f'strategies/{STRATEGY_FILE}', 'r') as file:
+        with open(f"configs/strategies/{STRATEGY_FILE}", "r") as file:
             strategy = yaml.safe_load(file)
         return strategy
     except FileNotFoundError:
@@ -73,6 +80,20 @@ def load_strategy_config() -> Dict:
         raise
 
 
+def create_local_orders_dir():
+    """
+    Create the local orders directory if it doesn't exist.
+    """
+    try:
+        ORDER_TRACKING_DIR.mkdir(exist_ok=True)
+    except FileExistsError:
+        logger.info(f"Local orders directory already exists: {ORDER_TRACKING_DIR}")
+        return
+    except Exception as e:
+        logger.exception(f"Error creating local orders directory: {e}")
+        raise
+
+
 def parse_token_pid(token_pid) -> Tuple[str, str]:
     """
     Parse the token policy ID and hex name from the token.
@@ -81,18 +102,37 @@ def parse_token_pid(token_pid) -> Tuple[str, str]:
         policy, token_name_hex = token_pid.split(".")
         return policy, token_name_hex
     except ValueError:
-        logger.error(f"Invalid token PID format (expected 'policy.token_name_hex'): {token_pid}")
+        logger.error(
+            f"Invalid token PID format (expected 'policy.token_name_hex'): {token_pid}"
+        )
         raise
-    
+
 
 def check_wallets(tokens):
     """
-    Check the wallets for the tokens.
+    Check if wallets for the tokens exist else create.
     """
     for token_name, _ in tokens.items():
         try:
             create_signing_key(f"{KEY_PREFIX}{token_name}")
-        except FileExistsError as e:
-            logger.info(f"Wallet already exists for {token_name}: {e}")
+        except FileExistsError:
+            logger.info(f"Wallet already exists for {token_name}")
             continue
-        
+
+
+def get_current_block_height():
+    try:
+        latest_block = CONTEXT.api.block_latest()
+        return latest_block.height
+    except Exception as e:
+        log_exception(logger, "Error getting block height", e)
+        return None
+
+
+def get_tx_block_height(txHash: str):
+    try:
+        tx_info = CONTEXT.api.transaction(txHash)
+        return tx_info.block_height
+    except Exception as e:
+        log_exception(logger, "Error getting transaction info", e)
+        return None

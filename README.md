@@ -1,60 +1,109 @@
 # MuesliSwap Market Making Bot
 
-Repository for the MuesliSwap market making bot framework.
- 
-To use the framework for trading and liquidity provision on MuesliSwap, stay tuned for our upcoming integration with the MuesliSwap DEX.
+Open-Source framework for the Muesliswap market making bot.  
+
+## Warning
+
+:warning: **Use the market-making bot at your own risk.** Running this bot involves substantial risk, including the potential loss of funds. Only use this bot with amounts that you are willing to lose. The developers and contributors of this bot are not liable for any financial losses that may occur from using this software. Make sure you understand the code and the strategies. By using this bot, you acknowledge that you are aware of the risks involved and assume all responsibility.
 
 ## Project Documentation
 
 Below is a documentation of the files and directories in the project:
 
-- `keys/`: Will be created by ```gen_wallet.py```. Contains addreses, skeys and vkeys for transactions.
-- `logs/`: Log files for the bot's operations and events, will be created by the logger.
+### Main Script
+
+- `run.py`: The main executable script that runs the bot.
+
+### Main components of the bot
+The `/bot` directory contains the main components of the bot.
+
+  - `health_check.py`: Health check script for the API endpoints.
+  - `inventory_management.py`: Manages and monitors inventory.
+  - `muesli_bot.py`: The main bot script responsible for executing trades.
+  - `order_book_tracking.py`: Tracks the state of the order book.
+  - `order_management.py`: Handles order tracking of the bot.
+  - `price.py`: Contains functionality for price data retrieval.
+  - `strategy.py`: Implements the trading strategy of the bot.
+  - `transactions.py`: Handles the creation and submission of transactions to the exchange.
+
+  - `/utils`: Utility scripts for various functions such as wallet generation and logging.
+    - `datum_utils.py`: Utilities for handling datum construction for orders.
+    - `gen_wallet.py`:  Utility script for generating wallets and keys.
+    - `logger.py`: Custom logger for the bot's operation.
+    - `order_utils.py`: Utilities related to order management.
+    - `transaction_utils.py`: Utilities for transaction order placement and cancelation.
+    - `utils.py`: Generic utility functions used across the bot.
+
+### Configurations
+The `/configs` directory contains all configuration files for the bot. Configuration files are used to set up trading parameters, API keys, and other necessary settings for the bot to operate.
+
+- `config.py`: The central configuration script where you can set environment variables and global settings.
+- `msw_connector_config.py`: Configuration for the MuesliSwap connector, setting up endpoints, transaction metadata, etc.
+- `secret_template.py`: A template for storing secrets. Rename to `secret.py` and add your actual secret keys.
+
 - `strategies/`: Strategy configuration files in YAML format.
   - `standard_market_making_mainnet.yaml`: Configuration for standard market making on the mainnet.
   - `standard_market_making_preprod.yaml`: Configuration for standard market making on the preprod testnet.
-- `config.py`: Configuration file where global parameters are set.
-- `gen_wallet.py`: Utility script for generating wallets and keys.
-- `health_check.py`: Script to check the bot's health and connectivity to the exchange.
-- `inventory_management.py`: Manages the bot's inventory for the traded tokens.
-- `logger.py`: Sets up logging for the bot.
-- `main.py`: The main executable script that runs the market making bot.
-- `muesli_bot.py`: Core loop of the bot's functionalities and trading logic.
-- `order_book_tracking.py`: Tracks the state of the order book on the exchange.
-- `order_management.py`: Track the active orders of the bot.
+
+### Other Files & Directories
+
+- `/scripts`: Directory containg the script's cbor.
+  - `script.cbor`: Script cbor for canceling orders.
+
 - `poetry.lock`: Lockfile for specifying exact versions of dependencies.
-- `price.py`: Fetches token pricing information.
 - `pyproject.toml`: Defines the project and its dependencies.
-- `secret_template.py`: Template for secrets configuration. Rename to `secret.py` and fill out before use.
-- `strategy.py`: Defines and manages the bot's trading strategies.
-- `transaction_utils.py`: Helper functions for creating and managing transactions.
-- `transactions.py`: Handles the creation and submission of transactions to the exchange.
-- `utils.py`: Utility functions used across the bot.
+
+- `keys/`: Will be created by ```gen_wallet.py```. Contains addreses, skeys and vkeys for the wallets. After creation, you will need to fund the wallet for the bot to operate.
+- `logs/`: Log files for the bot's operations and events.
+- `orders/`: Will be created by bot. Contains logs of open/matched/canceled orders.
+- `inventory/`: Will be created by bot. Logs the inventory (lovelace and tokens) state over time.
+
+## MuesliSwap Integration
+
+This bot integrates with the MuesliSwap Decentralized Exchange (DEX) through its API, enabling the retrieval of order book details, current prices, and active orders managed by the bot.
+
+### Configuration
+API configurations are set within the `configs/msw_connector_config.py` file.
+
+### Key API Endpoints
+- **Health Check**: `/health` - Verifies the API's operational status.
+- **Order Book**: `/orderbook` - Retrieves the order book for specified token pairs.
+- **Price Query**: `/price` - Obtains the current prices for specific token pairs.
+- **Open Positions**: `/open-positions` - Checks the number of open positions for a particular token.
+- **Order Status**: `/orders/v2` - Queries the status (open, matched, or canceled) of orders for a specified token.
+
+### Documentation
+For more detailed information about the API's capabilities and usage, refer to the official [MuesliSwap API Documentation](https://docs.muesliswap.com/cardano/muesli-api).
+
+### Trading Logic
+The methods for placing and canceling orders within the MuesliSwap order book are implemented in `bot/transactions.py`.
 
 
 ## Setup
 
-### Install Dependencies:  
+Follow these steps to set up the up bot.
+
+### Install Dependencies
 
 ```
 poetry install
 poetry shell
 ```
 
-### Configure Node  
+### Configure Blockfrost  
 
-You will need Blockfrost or Ogmios endpoints
+You will need Blockfrost to operate the bot.
 1. Change ```secret_template.py``` to ```secret.py```
-2. Fill in your environment parameters with the correct value for Blockfrost or Ogmios and Kupo endpoints.
+2. Fill in your environment parameters with the correct values for your Blockfrost project.
 
-### Basic Parameter Configuration:
+### Basic Parameter Configuration
 
-Adjust parameters in ```config.py``` to your preferences:
-1. Switch between Mainnet and Preprod for testing
-2. Choose one of the strategy files under ```/strategies``` (e.g. ```standard_market_making.yaml```) or write your own strategy
+Adjust parameters in ```configs/config.py``` to your preferences:
+1. Switch between Mainnet and Preprod for testing.
+2. Choose one of the strategy files under ```configs/strategies``` (e.g. ```standard_market_making.yaml```) or write your own strategy.
 3. Update the tokens you want to trade
 
-### Configure Strategy Parameters:
+### Configure Strategy Parameters
 
 Adjust the parameters in your ```strategy.yaml``` (e.g. ```standard_market_making.yaml```) to your needs:
 
@@ -62,15 +111,16 @@ Adjust the parameters in your ```strategy.yaml``` (e.g. ```standard_market_makin
 "name": "standard_market_making",   # Name of the strategy
 "type": "market_making",            # Type of strategy, e.g. market_making
 "exchange": "muesliswap",           # Exchange to run the strategy on
-"n_orders": 3,                      # Number of orders to place on each side of the order book
-"delta": 0.01,                      # Distance between orders as a fraction of the mid price
-"order_refresh_threshold": 0.01,    # Percentage change in price to trigger order refresh
-"loop_interval": 1,                 # Time in seconds between each loop
+"n_orders": 1,                      # Number of orders to place on each side of the order book
+"delta": 0.05,                      # Distance between orders as a fraction of the mid price
+"order_refresh_threshold": 0.1,     # Percentage change in price to trigger order refresh
+"loop_interval": 5,                 # Time in seconds between each loop
 "tokens": {                         # Tokens to trade
-    "MILK": {                                                               
+    "MILKv2": {                                                               
         "hexname": "4d494c4b7632",
         "policy_id": "afbe91c0b44b3040e360057bf8354ead8c49c4979ae6ab7c4fbdc9eb",
-        "amount": 5,   # Amount of tokens per trade
+        "amount": 1000000,   # Amount tokens per trade including decimals, i.e. 1000000 corresponds to 1 MILKv2
+        "decimals": 6 # Number of decimals in the token
     }
 }
 ```
@@ -81,6 +131,5 @@ The bot expects a separate wallet and corresponding keys for each token specifie
 When you run ```python main.py``` the bot checks for the existence of the wallets for all tokens and creates new wallets if they don't exist.
 To use the bot, you will need to fund the newly created wallets with ADA and the respective token.
 
-### Run Market Maker
-
-Execute ```python main.py```
+### Run the bot
+After everything is set up, you can run the bot by executing ```python run.py```.
