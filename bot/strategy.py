@@ -105,7 +105,7 @@ class StandardMarketMakingStrategy:
                         f"Insufficient UTxOs. Await previous txs or add more funds"
                     )
                 except Exception as e:
-                    log_exception(logger, "Error placing buy order", e)
+                    log_exception(logger, "Error canceling order", e)
 
         # Alternate between placing buy and sell orders
         max_length = max(len(buy_prices), len(sell_prices))
@@ -172,7 +172,7 @@ class StandardMarketMakingStrategy:
                             f"Insufficient UTxOs. Await previous txs or add more funds"
                         )
                     except Exception as e:
-                        log_exception(logger, "Error placing buy order", e)
+                        log_exception(logger, "Error placing sell order", e)
 
     def check_if_cancel_order(self, bot, order: Dict, token_name: str):
         """Cancel order if it moved out of the price range"""
