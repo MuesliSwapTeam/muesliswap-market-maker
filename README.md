@@ -44,6 +44,12 @@ The `/configs` directory contains all configuration files for the bot. Configura
 - `strategies/`: Strategy configuration files in YAML format.
   - `standard_market_making_mainnet.yaml`: Configuration for standard market making on the mainnet.
   - `standard_market_making_preprod.yaml`: Configuration for standard market making on the preprod testnet.
+  - `aggressive_market_making_mainnet.yaml`: Configuration for aggressive market making on the mainnet.
+  - `aggressive_market_making_preprod.yaml`: Configuration for aggressive market making on the preprod testnet.
+  - `volume_based_adaptive_mainnet.yaml`: Configuration for volume-based adaptive strategy on the mainnet.
+  - `volume_based_adaptive_preprod.yaml`: Configuration for volume-based adaptive strategy on the preprod testnet.
+  - `trend_following_mainnet.yaml`: Configuration for trend-following strategy on the mainnet.
+  - `trend_following_preprod.yaml`: Configuration for trend-following strategy on the preprod testnet.
 
 ### Other Files & Directories
 
@@ -105,7 +111,30 @@ Adjust parameters in ```configs/config.py``` to your preferences:
 
 ### Configure Strategy Parameters
 
-Adjust the parameters in your ```strategy.yaml``` (e.g. ```standard_market_making.yaml```) to your needs:
+The bot supports multiple customizable trading strategies. Choose one of the available strategies and adjust the parameters in your ```strategy.yaml``` file:
+
+#### Available Strategies
+
+1. **Standard Market Making** (`standard_market_making`)
+   - Basic market making with fixed spreads
+   - Suitable for stable markets with consistent liquidity
+
+2. **Aggressive Market Making** (`aggressive_market_making`)
+   - Tighter spreads with dynamic adjustment based on volatility
+   - Higher frequency trading with risk management
+   - Best for active markets where you want to capture more volume
+
+3. **Volume-Based Adaptive** (`volume_based_adaptive`)
+   - Adjusts spreads based on trading volume patterns
+   - Tighter spreads during high volume, wider during low volume
+   - Ideal for markets with varying activity levels
+
+4. **Trend Following** (`trend_following`)
+   - Places more orders in the direction of price trends
+   - Uses Simple Moving Average (SMA) for trend detection
+   - Suitable for trending markets
+
+#### Basic Configuration Example
 
 ```
 "name": "standard_market_making",   # Name of the strategy
@@ -124,6 +153,27 @@ Adjust the parameters in your ```strategy.yaml``` (e.g. ```standard_market_makin
     }
 }
 ```
+
+#### Strategy-Specific Parameters
+
+**Aggressive Market Making:**
+- `volatility_multiplier`: How much volatility affects spread adjustment (default: 1.5)
+- `min_delta`: Minimum spread (default: 0.005)
+- `max_delta`: Maximum spread (default: 0.05)
+- `price_history_length`: Number of price points for volatility calculation (default: 20)
+
+**Volume-Based Adaptive:**
+- `volume_threshold_high`: High volume threshold multiplier (default: 1.5)
+- `volume_threshold_low`: Low volume threshold multiplier (default: 0.5)
+- `high_volume_delta_multiplier`: Spread multiplier for high volume (default: 0.7)
+- `low_volume_delta_multiplier`: Spread multiplier for low volume (default: 1.3)
+- `volume_history_length`: Number of volume points for average calculation (default: 10)
+
+**Trend Following:**
+- `trend_strength_threshold`: Minimum price deviation from SMA to consider a trend (default: 0.02)
+- `trend_multiplier`: Multiplier for trend-biased order placement (default: 1.5)
+- `sma_period`: Period for Simple Moving Average calculation (default: 10)
+- `price_history_length`: Number of price points for trend analysis (default: 20)
 
 ### Setup Wallets
 

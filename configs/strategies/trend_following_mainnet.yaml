@@ -1,0 +1,24 @@
+{
+    "name": "trend_following",            # Name of the strategy
+    "type": "market_making",              # Type of strategy: market_making, arbitrage, etc
+    "exchange": "muesliswap",             # Exchange to run the strategy on
+    "n_orders": 2,                        # Number of orders to place on each side of the order book
+    "delta": 0.05,                        # Base distance between orders as a fraction of the mid price
+    "order_refresh_threshold": 0.25,      # Percentage change in price to trigger order refresh
+    "loop_interval": 5,                   # Time in seconds between each loop
+    
+    # Trend-following strategy specific parameters
+    "trend_strength_threshold": 0.02,     # Minimum price deviation from SMA to consider a trend (2%)
+    "trend_multiplier": 1.5,              # Multiplier for trend-biased order placement
+    "sma_period": 10,                     # Period for Simple Moving Average calculation
+    "price_history_length": 20,           # Number of price points to keep for trend analysis
+    
+    "tokens": {                           # Tokens to trade
+        "MILKv2": {                                                               
+            "hexname": "4d494c4b7632",
+            "policy_id": "afbe91c0b44b3040e360057bf8354ead8c49c4979ae6ab7c4fbdc9eb",
+            "amount": 1000000,   # Amount tokens per trade including decimals, i.e. 1000000 corresponds to 1 MILKv2
+            "decimals": 6 # Number of decimals in the token
+        }
+    }
+}
